@@ -1,5 +1,6 @@
 ﻿using TicketSystem.Application.Commands;
 using TicketSystem.Application.Interfaces;
+using TicketSystem.Domain.Enums;
 using TicketSystem.Domain.Models;
 
 namespace TicketSystem.Application.CommandHandlers
@@ -13,7 +14,7 @@ namespace TicketSystem.Application.CommandHandlers
             this.ticketRepository = ticketRepository;
         }
 
-        public Task<Ticket> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
+        public async Task<Ticket> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
         {
             var ticket = new Ticket
             {
@@ -23,10 +24,10 @@ namespace TicketSystem.Application.CommandHandlers
                 Governorate = request.Governorate,
                 City = request.City,
                 District = request.District,
-                Status = "New"
+                Status = TicketStatus.New,
             };
-            ticketRepository.AddTicket(ticket);
-            return Task.FromResult(ticket);
+            await ticketRepository.AddTicketAsync(ticket);
+            return ticket;
         }
     }
 }

@@ -2,11 +2,11 @@
 
 namespace TicketSystem.Application.Interfaces
 {
-    public interface ITicketRepository
-    {
-        void AddTicket(Ticket ticket);
-        IEnumerable<Ticket> GetTickets(int pageNumber, int pageSize);
-        Ticket GetTicketById(int id);
-        void UpdateTicket(Ticket ticket);
-    }
+        public interface ITicketRepository
+        {
+            Task AddTicketAsync(Ticket ticket);
+            Task<IEnumerable<Ticket>> GetTicketsAsync(int pageNumber, int pageSize);
+            Task<Ticket> GetTicketByIdAsync(int id);
+            Task UpdateTicketAsync(Ticket ticket);
+        }
 }

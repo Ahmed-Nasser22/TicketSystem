@@ -1,4 +1,6 @@
-﻿namespace TicketSystem.Domain.Models
+﻿using TicketSystem.Domain.Enums;
+
+namespace TicketSystem.Domain.Models
 {
     public class Ticket
     {
@@ -9,6 +11,6 @@
         public string City { get; set; }
         public string District { get; set; }
         public bool IsHandled { get; set; }
-        public string Status { get; set; }
+        public TicketStatus Status { get; set; }
     }
 }
