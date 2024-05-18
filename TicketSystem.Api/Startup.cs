@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using TicketSystem.Application.BackgroundJobs;
+using TicketSystem.Application.Commands;
 using TicketSystem.Application.Interfaces;
 using TicketSystem.Domain;
 using TicketSystem.Infrastructure.Repositories;
@@ -31,7 +33,8 @@ namespace TicketSystem.Api
             {
                 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
             }
-
+            // Register background job for hanlding tickets after 1 hour of creation.
+            RegisterBackgroundHostingStartup.RegisterRepetitiveJob<HandleTicketsBackgroundJobCommand>(builder.Services, 10);
         }
         public void ConfigurePipeLine(IApplicationBuilder app)
         {

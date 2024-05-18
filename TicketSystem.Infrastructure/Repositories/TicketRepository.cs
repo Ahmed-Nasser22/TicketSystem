@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketSystem.Application.Interfaces;
 using TicketSystem.Domain;
+using TicketSystem.Domain.Enums;
 using TicketSystem.Domain.Models;
 
 namespace TicketSystem.Infrastructure.Repositories
@@ -43,6 +44,21 @@ namespace TicketSystem.Infrastructure.Repositories
                 throw new KeyNotFoundException("Ticket Not Found");
             }
             return ticket;
+        }
+        public async Task HandleDueTicketsAsync()
+        {
+            var ticketsToUpdate = await context.Tickets
+              .Where(ticket => ticket.CreationDateTime <= DateTime.UtcNow.AddSeconds(10) && ticket.Status == TicketStatus.New)
+              .ToListAsync();
+            if(ticketsToUpdate.Count > 0)
+            {
+                foreach (var ticket in ticketsToUpdate)
+                {
+                    ticket.Status = TicketStatus.Handled;
+                }
+
+                await context.SaveChangesAsync();
+            }
         }
 
     }
