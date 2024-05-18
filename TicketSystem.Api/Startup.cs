@@ -11,7 +11,7 @@ namespace TicketSystem.Api
     public class Startup
     {
 
-        public void ConfigureServices(WebApplicationBuilder  builder)
+        public void ConfigureServices(WebApplicationBuilder builder)
         {
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
@@ -24,17 +24,20 @@ namespace TicketSystem.Api
         }
         private void RegisterServices(WebApplicationBuilder builder)
         {
-            // Entity Framework Core configuration
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddScoped<ITicketRepository, TicketRepository>();
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+
+            builder.Services.AddMediatR(cfg =>
             {
-                builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
-            }
+                    cfg.Lifetime = ServiceLifetime.Scoped;
+                    cfg.RegisterServicesFromAssemblyContaining<HandleTicketsBackgroundJobCommand>();
+            });
+
             // Register background job for hanlding tickets after 1 hour of creation.
-            builder.Services.RegisterRepetitiveJob<HandleTicketsBackgroundJobCommand>(10);
+            builder.Services.RegisterRepetitiveJob<HandleTicketsBackgroundJobCommand>(3600);
         }
         public void ConfigurePipeLine(IApplicationBuilder app)
         {
@@ -46,5 +49,5 @@ namespace TicketSystem.Api
                 endpoints.MapControllers();
             });
         }
-        }
+    }
 }

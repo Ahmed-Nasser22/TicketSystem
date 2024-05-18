@@ -11,10 +11,8 @@ namespace TicketSystem.Application.BackgroundJobs
         {
             services.AddHostedService(sp =>
             {
-
-                    var logger = sp.GetRequiredService<ILogger<RepetitiveJob<TCommand>>>();
-                var mediator = sp.GetRequiredService<IMediator>();
-                return new RepetitiveJob<TCommand>(mediator, logger, repeatInSeconds);
+                var serviceScopeFactory  = services.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>();
+                return new RepetitiveJob<TCommand>(repeatInSeconds , serviceScopeFactory);
             });
             return services;
         }

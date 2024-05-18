@@ -2,29 +2,26 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TicketSystem.Application.Interfaces;
 
 namespace TicketSystem.Application.BackgroundJobs
 {
-    public class RepetitiveJob<TCommand> : IHostedService 
-        where TCommand : class , IRequest , new ()
+    public class RepetitiveJob<TCommand> : IHostedService
+        where TCommand : class, IRequest, new()
     {
         private Timer timer;
         private readonly int timerSchedule;
-        private readonly IMediator mediator;
-        private readonly ILogger<RepetitiveJob<TCommand>> logger;
-   
-        public RepetitiveJob(IMediator mediator , ILogger<RepetitiveJob<TCommand>> logger, int repeatInSeconds )
+        public IServiceScopeFactory serviceScopeFactory;
+
+        public RepetitiveJob(int repeatInSeconds, IServiceScopeFactory serviceScopeFactory)
         {
-            this.mediator = mediator;
-            this.logger = logger;
             timerSchedule = (int)new TimeSpan(0, 0, repeatInSeconds).TotalMilliseconds;
+            this.serviceScopeFactory = serviceScopeFactory;
         }
 
-        public  async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            timer = new Timer(async _=> await OnTimerFiredAsync(cancellationToken),
-                null , timerSchedule , Timeout.Infinite);
+            timer = new Timer(async _ => await OnTimerFiredAsync(cancellationToken),
+                null, timerSchedule, timerSchedule);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -34,9 +31,13 @@ namespace TicketSystem.Application.BackgroundJobs
         }
         private async Task OnTimerFiredAsync(CancellationToken cancellationToken)
         {
+            using (var scope = serviceScopeFactory.CreateScope())
+            {
                 var jobName = typeof(TCommand).Name;
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<RepetitiveJob<TCommand>>>();
                 try
                 {
+                    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                     var myCommand = new TCommand();
                     logger.LogInformation("{RepetitiveJob} started at : {now}", jobName, DateTime.UtcNow.ToString("o"));
                     await mediator.Send(myCommand, cancellationToken);
@@ -51,6 +52,7 @@ namespace TicketSystem.Application.BackgroundJobs
                 {
                     logger.LogInformation("{RepetitiveJob} scheduling new instance  after : {timerSchedule} Mills", jobName, timerSchedule);
                 }
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ namespace TicketSystem.Infrastructure.Repositories
         public async Task<IEnumerable<Ticket>> GetTicketsAsync(int pageNumber, int pageSize)
         {
             return await context.Tickets
+                .OrderByDescending(s=>s.CreationDateTime)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -48,13 +49,14 @@ namespace TicketSystem.Infrastructure.Repositories
         public async Task HandleDueTicketsAsync()
         {
             var ticketsToUpdate = await context.Tickets
-              .Where(ticket => ticket.CreationDateTime <= DateTime.UtcNow.AddSeconds(10) && ticket.Status == TicketStatus.New)
+              .Where(ticket => ticket.CreationDateTime <= DateTime.UtcNow.AddMinutes(-60) && ticket.Status == TicketStatus.New)
               .ToListAsync();
             if(ticketsToUpdate.Count > 0)
             {
                 foreach (var ticket in ticketsToUpdate)
                 {
                     ticket.Status = TicketStatus.Handled;
+                    ticket.IsHandled = true;
                 }
 
                 await context.SaveChangesAsync();

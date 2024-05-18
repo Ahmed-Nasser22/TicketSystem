@@ -20,7 +20,7 @@ namespace TicketSystem.Application.CommandHandlers
             var ticket = new Ticket
             {
                 Id = new Guid(),
-                CreationDateTime = DateTime.Now,
+                CreationDateTime = DateTime.UtcNow,
                 PhoneNumber = request.PhoneNumber,
                 Governorate = request.Governorate,
                 City = request.City,
