@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Reflection;
+using System.Text.Json.Serialization;
 using TicketSystem.Application.Interfaces;
 using TicketSystem.Domain;
 using TicketSystem.Infrastructure.Repositories;
@@ -8,46 +8,36 @@ namespace TicketSystem.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
 
-        public IConfiguration Configuration { get; }
-
-        // This method is called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(WebApplicationBuilder  builder)
         {
-            services.AddControllers();
-
-            // Entity Framework Core configuration
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(connectionString));
-            RegisterServices(services);
-            // Swagger configuration
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
-        }
-        private void RegisterServices(IServiceCollection services)
-        {
-            services.AddScoped<ITicketRepository, TicketRepository>();
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
-        }
-        // This method is called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
+            builder.Services.AddControllers().AddJsonOptions(options =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            }); ;
+            RegisterServices(builder);
+            // Swagger configuration
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+        }
+        private void RegisterServices(WebApplicationBuilder builder)
+        {
+            // Entity Framework Core configuration
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(connectionString));
+            builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
             }
 
+        }
+        public void ConfigurePipeLine(IApplicationBuilder app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseRouting();
-
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

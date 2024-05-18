@@ -23,9 +23,21 @@ namespace TicketSystem.Api.Controllers
         [HttpPost("handle/{id}")]
         public async Task<IActionResult> HandleTicket(Guid id)
         {
-            var command = new HandleTicketCommand { Id = id };
-            var ticket = await mediator.Send(command);
-            return Ok(ticket);
+
+            try
+            {
+                var command = new HandleTicketCommand(id);
+                var ticket = await mediator.Send(command);
+                return Ok(ticket);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { Message = "Ticket not found" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An unexpected error occurred", Details = ex.Message });
+            }
         }
     }
 }

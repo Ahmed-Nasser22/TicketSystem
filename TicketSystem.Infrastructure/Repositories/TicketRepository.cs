@@ -14,12 +14,19 @@ namespace TicketSystem.Infrastructure.Repositories
             this.context = context;
         }
 
-        public async Task AddTicketAsync(Ticket ticket)
+        public async Task<Ticket> AddTicketAsync(Ticket ticket)
         {
-            await context.Tickets.AddAsync(ticket);
+            var result = context.Tickets.Add(ticket);
             await context.SaveChangesAsync();
+            return result.Entity;
         }
 
+        public async Task<Ticket> UpdateTicketAsync(Ticket ticket)
+        {
+            context.Entry(ticket).State = EntityState.Modified;
+            await context.SaveChangesAsync();
+            return ticket;
+        }
         public async Task<IEnumerable<Ticket>> GetTicketsAsync(int pageNumber, int pageSize)
         {
             return await context.Tickets
@@ -30,13 +37,13 @@ namespace TicketSystem.Infrastructure.Repositories
 
         public async Task<Ticket> GetTicketByIdAsync(Guid id)
         {
-            return await context.Tickets.FindAsync(id);
+            var ticket = await context.Tickets.FindAsync(id);
+            if (ticket == null)
+            {
+                throw new KeyNotFoundException("Ticket Not Found");
+            }
+            return ticket;
         }
 
-        public async Task UpdateTicketAsync(Ticket ticket)
-        {
-            context.Entry(ticket).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-        }
     }
 }

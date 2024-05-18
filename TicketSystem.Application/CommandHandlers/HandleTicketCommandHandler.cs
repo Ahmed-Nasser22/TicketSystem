@@ -17,14 +17,19 @@ namespace TicketSystem.Application.CommandHandlers
 
         public async Task<Ticket> Handle(HandleTicketCommand request, CancellationToken cancellationToken)
         {
-            var result = ticketRepository.GetTicketByIdAsync(request.Id);
-           
-                var ticket = result.Result;
+            try
+            {
+                var ticket = await ticketRepository.GetTicketByIdAsync(request.Id);
                 ticket.IsHandled = true;
                 ticket.Status = TicketStatus.Handled;
-               await ticketRepository.UpdateTicketAsync(ticket);
-               return ticket;
-            
+                await ticketRepository.UpdateTicketAsync(ticket);
+                return ticket;
+            }
+            catch (KeyNotFoundException)
+            {
+                throw;
+            }
+
         }
     }
 }

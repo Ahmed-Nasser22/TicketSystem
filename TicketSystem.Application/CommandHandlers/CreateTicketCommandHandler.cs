@@ -27,8 +27,7 @@ namespace TicketSystem.Application.CommandHandlers
                 District = request.District,
                 Status = TicketStatus.New,
             };
-            await ticketRepository.AddTicketAsync(ticket);
-            return ticket;
+           return await ticketRepository.AddTicketAsync(ticket);
         }
     }
 }
