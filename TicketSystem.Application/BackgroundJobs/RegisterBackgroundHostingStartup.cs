@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using TicketSystem.Application.Interfaces;
 
 namespace TicketSystem.Application.BackgroundJobs
 {

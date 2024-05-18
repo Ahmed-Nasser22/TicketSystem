@@ -34,7 +34,7 @@ namespace TicketSystem.Api
                 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
             }
             // Register background job for hanlding tickets after 1 hour of creation.
-            RegisterBackgroundHostingStartup.RegisterRepetitiveJob<HandleTicketsBackgroundJobCommand>(builder.Services, 10);
+            builder.Services.RegisterRepetitiveJob<HandleTicketsBackgroundJobCommand>(10);
         }
         public void ConfigurePipeLine(IApplicationBuilder app)
         {
