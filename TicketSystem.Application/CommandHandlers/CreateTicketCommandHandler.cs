@@ -1,11 +1,12 @@
-﻿using TicketSystem.Application.Commands;
+﻿using MediatR;
+using TicketSystem.Application.Commands;
 using TicketSystem.Application.Interfaces;
 using TicketSystem.Domain.Enums;
 using TicketSystem.Domain.Models;
 
 namespace TicketSystem.Application.CommandHandlers
 {
-    public class CreateTicketCommandHandler
+    public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, Ticket>
     {
         private readonly ITicketRepository ticketRepository;
 

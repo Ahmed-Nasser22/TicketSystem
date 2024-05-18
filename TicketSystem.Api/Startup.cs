@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using TicketSystem.Application.Interfaces;
 using TicketSystem.Domain;
 using TicketSystem.Infrastructure.Repositories;
@@ -31,6 +32,8 @@ namespace TicketSystem.Api
         private void RegisterServices(IServiceCollection services)
         {
             services.AddScoped<ITicketRepository, TicketRepository>();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
         }
         // This method is called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
