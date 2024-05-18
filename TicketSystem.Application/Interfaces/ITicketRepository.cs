@@ -6,7 +6,7 @@ namespace TicketSystem.Application.Interfaces
         {
             Task AddTicketAsync(Ticket ticket);
             Task<IEnumerable<Ticket>> GetTicketsAsync(int pageNumber, int pageSize);
-            Task<Ticket> GetTicketByIdAsync(int id);
+            Task<Ticket> GetTicketByIdAsync(Guid id);
             Task UpdateTicketAsync(Ticket ticket);
         }
 }
