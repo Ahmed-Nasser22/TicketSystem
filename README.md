@@ -17,7 +17,9 @@ This project is structured following the Clean Architecture pattern, ensuring se
   - Implement commands and queries using MediatR for CQRS pattern.
   - Define business rules and validation logic.
   - Handle use cases for creating and handling tickets.
-
+    ### Background Service
+    The Application layer also includes a generic background service for scheduling tasks. This service is responsible for handling           tickets   that have been created but not handled after a certain period (e.g., 1 hour).
+    The Background service can also be registered with different command handler to handle a different task with different delay time.
 ### 3. **TicketSystem.Domain**
 - **Purpose**: Represents the core of the application with business entities and enums.
 - **Responsibilities**:
