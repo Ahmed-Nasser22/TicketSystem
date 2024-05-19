@@ -41,6 +41,10 @@ namespace TicketSystem.Api
         }
         public void ConfigurePipeLine(IApplicationBuilder app)
         {
+            app.UseCors(builder =>
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader());
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseRouting();
